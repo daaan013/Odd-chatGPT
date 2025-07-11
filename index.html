@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comparador de Odds + Calculadora EV</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 15px;
+      background: #f9f9f9;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      color: #2a7f2a;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 5px #ccc;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #2a7f2a;
+      color: white;
+    }
+    .best-odd {
+      background-color: #d4edda;
+      font-weight: bold;
+      color: #155724;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type=number] {
+      padding: 6px;
+      margin-left: 10px;
+      width: 70px;
+    }
+    button {
+      background-color: #2a7f2a;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #2a7f2a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Comparador de Odds + Calculadora EV</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Casa de Apostas</th>
+        <th>Odd (Mais de 0.5 HT)</th>
+      </tr>
+    </thead>
+    <tbody id="odds-table"></tbody>
+  </table>
+
+  <div>
+    <label for="probabilidade">Sua estimativa de chance (%):</label>
+    <input type="number" id="probabilidade" min="1" max="100" value="60" />
+    <button onclick="calcularEV()">Calcular EV</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    const odds = [
+      { casa: "Bet365", odd: 1.80 },
+      { casa: "Pinnacle", odd: 1.85 },
+      { casa: "Sportingbet", odd: 1.75 }
+    ];
+
+    function exibirOdds() {
+      const tbody = document.getElementById('odds-table');
+      tbody.innerHTML = '';
+      const maiorOdd = Math.max(...odds.map(o => o.odd));
+      odds.forEach(o => {
+        const tr = document.createElement('tr');
+        if(o.odd === maiorOdd) tr.classList.add('best-odd');
+        tr.innerHTML = `<td>${o.casa}</td><td>${o.odd.toFixed(2)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function calcularEV() {
+      const pInput = document.getElementById('probabilidade');
+      let p = Number(pInput.value);
+      if (isNaN(p) || p <= 0 || p > 100) {
+        alert('Digite uma probabilidade válida entre 1 e 100');
+        return;
+      }
+      p = p / 100;
+      const maiorOdd = Math.max(...odds.map(o => o.odd));
+      const ev = (p * maiorOdd) - 1;
+      const resultadoDiv = document.getElementById('resultado');
+      resultadoDiv.innerHTML = `
+        Usando a melhor odd: <strong>${maiorOdd.toFixed(2)}</strong><br />
+        Valor esperado (EV): <strong>${ev.toFixed(3)}</strong> ${ev > 0 ? '✅ Aposta com valor positivo' : '❌ Aposta não recomendada'}
+      `;
+    }
+
+    exibirOdds();
+  </script>
+</body>
+</html>
